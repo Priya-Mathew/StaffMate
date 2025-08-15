@@ -1,0 +1,141 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "hr@example.com",
+      "password": "hr123",
+      "role": "HR",
+      "name": "HR Manager",
+      "phone": "12345666",
+      "department": "HR",
+      "dob": "1980-05-10",
+      "joiningDate": "2010-06-15"
+    },
+    {
+      "name": "Blaizon Mathai",
+      "email": "priya@gmail.com",
+      "password": "emp123",
+      "role": "Employee",
+      "phone": "4632749334",
+      "department": "Development",
+      "id": "2",
+      "dob": "1981-01-15",
+      "joiningDate": "2011-05-05",
+      "address": "433 Preakness Run",
+      "position": "Team Lead",
+      "gender": "Male",
+      "maritalStatus": "Married",
+      "nationality": "Canadian"
+    },
+    {
+      "id": "1921",
+      "name": "Mathew S",
+      "email": "Mathew@gmail.com",
+      "dob": "1992-02-12",
+      "joiningDate": "2011-01-01",
+      "address": "4365 ABC ",
+      "department": "HR",
+      "position": "Manager",
+      "gender": "Male",
+      "maritalStatus": "Single",
+      "nationality": "American",
+      "status": "Active",
+      "role": "HR",
+      "password": "7890",
+      "confirmPassword": "7890"
+    },
+    {
+      "id": "4711",
+      "name": "Jasmin M",
+      "email": "Jasmin@gmail.com",
+      "dob": "2009-02-03",
+      "joiningDate": "2019-01-08",
+      "address": "XYZZ City",
+      "department": "IT",
+      "position": "Staff",
+      "gender": "Female",
+      "maritalStatus": "Single",
+      "nationality": "Indian",
+      "status": "Active",
+      "role": "Employee",
+      "password": "1234",
+      "confirmPassword": "1234"
+    },
+    {
+      "id": "06a3",
+      "name": "Ezlyn",
+      "email": "Ezlyn@gmail.com",
+      "dob": "2002-12-31",
+      "joiningDate": "2023-12-31",
+      "address": "ABC City",
+      "department": "IT",
+      "position": "Staff",
+      "gender": "Female",
+      "maritalStatus": "Single",
+      "nationality": "American",
+      "status": "Active",
+      "role": "Employee",
+      "password": "1234",
+      "confirmPassword": "1234"
+    },
+    {
+      "id": "8b54",
+      "name": "John Doe",
+      "email": "John@gmail.com",
+      "dob": "2007-06-05",
+      "joiningDate": "2021-06-08",
+      "address": "nyz city",
+      "department": "Finance",
+      "position": "Manager",
+      "gender": "Male",
+      "maritalStatus": "Single",
+      "nationality": "American",
+      "status": "Active",
+      "role": "Employee",
+      "password": "1234",
+      "confirmPassword": "1234"
+    }
+  ],
+  "leaveRequests": [
+    {
+      "id": "4b5d",
+      "userId": "2",
+      "fromDate": "2025-12-01",
+      "toDate": "2025-12-31",
+      "leaveType": "Maternity Leave",
+      "reason": "Maternity Leave",
+      "dateSubmitted": "2025-08-13T16:13:36.183Z",
+      "status": "Approved"
+    },
+    {
+      "id": "1ec2",
+      "fromDate": "2026-01-01",
+      "toDate": "2026-02-01",
+      "leaveType": "Casual Leave",
+      "reason": "Vacation",
+      "userId": "2",
+      "dateSubmitted": "2025-08-15T02:24:09.389Z",
+      "status": "Pending"
+    },
+    {
+      "id": "f0ba",
+      "fromDate": "2025-08-21",
+      "toDate": "2025-09-01",
+      "leaveType": "Paternity Leave",
+      "reason": "Paternity Leave",
+      "userId": "06a3",
+      "dateSubmitted": "2025-08-15T02:36:04.172Z",
+      "status": "Pending"
+    },
+    {
+      "id": "55e2",
+      "fromDate": "2025-09-01",
+      "toDate": "2025-10-01",
+      "leaveType": "Casual Leave",
+      "reason": "Casual Leave",
+      "userId": "8b54",
+      "dateSubmitted": "2025-08-15T02:36:54.853Z",
+      "status": "Pending"
+    }
+  ]
+}
