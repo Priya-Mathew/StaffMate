@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../store/slices/authSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -15,6 +15,7 @@ const loginSchema = Yup.object().shape({
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showResetModal, setShowResetModal] = useState(false);
 
   // Clear previous user on page load
   useEffect(() => {
@@ -135,6 +136,7 @@ export default function Login() {
                     className="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-2 focus:ring-indigo-500"
                   />
                   <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
+
                 </div>
 
                 {/* Role Selection */}
@@ -159,9 +161,8 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-3 rounded-md text-white font-semibold transition ${
-                    isSubmitting ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
-                  }`}
+                  className={`w-full py-3 rounded-md text-white font-semibold transition ${isSubmitting ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+                    }`}
                 >
                   {isSubmitting ? 'Logging in...' : 'Sign In'}
                 </button>
@@ -178,6 +179,15 @@ export default function Login() {
                       Sign Up
                     </button>
                   </p>
+                  <p className="text-gray-600 text-sm">
+                    <button
+                      type="button"
+                      onClick={() => setShowResetModal(true)}
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      Forgot password?
+                    </button>
+                  </p>
                 </div>
               </Form>
             )}
@@ -188,6 +198,101 @@ export default function Login() {
           </p>
         </div>
       </div>
+      {/* Reset Password Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+            <h2 className="text-2xl font-bold mb-4 text-center">Reset Password</h2>
+
+            <Formik
+              initialValues={{ email: '', password: '', confirmPassword: '' }}
+              validate={async (values) => {
+                const errors = {};
+                if (!values.email) errors.email = 'Required';
+                if (!values.password) errors.password = 'Required';
+                if (!values.confirmPassword) errors.confirmPassword = 'Required';
+                if (values.password && values.confirmPassword && values.password !== values.confirmPassword) {
+                  errors.confirmPassword = "Passwords don't match";
+                }
+
+                if (values.email) {
+                  try {
+                    const res = await axios.get(`http://localhost:4000/users?email=${values.email}`);
+                    if (res.data.length === 0) errors.email = 'Email does not exist';
+                  } catch {
+                    errors.email = 'Error checking email';
+                  }
+                }
+                return errors;
+              }}
+              onSubmit={async (values, { setSubmitting }) => {
+                try {
+                  const trimmedEmail = values.email.trim();
+                  // Get the user by email
+                  const res = await axios.get(`http://localhost:4000/users?email=${trimmedEmail}`);
+                  const user = res.data[0];
+                
+                  if (!user) {
+                    alert('User not found');
+                    return;
+                  }
+                  // Update password
+                  await axios.patch(`http://localhost:4000/users/${user.id}`, {
+                  password: values.password,
+                  confirmPassword:values.confirmPassword
+                  });
+
+                  alert('Password reset successful');
+                  setShowResetModal(false);
+                } catch (err) {
+                  alert('Error resetting password');
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              {({ isSubmitting }) => (
+                <Form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <Field type="email" name="email" className="w-full border border-gray-300 rounded-md px-4 py-2" />
+                    <ErrorMessage name="email" component="div" className="text-red-600 text-sm mt-1" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                    <Field type="password" name="password" className="w-full border border-gray-300 rounded-md px-4 py-2" />
+                    <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <Field type="password" name="confirmPassword" className="w-full border border-gray-300 rounded-md px-4 py-2" />
+                    <ErrorMessage name="confirmPassword" component="div" className="text-red-600 text-sm mt-1" />
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowResetModal(false)}
+                      className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                      {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

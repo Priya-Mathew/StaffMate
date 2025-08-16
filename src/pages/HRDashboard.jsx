@@ -13,13 +13,14 @@ export default function HRDashboard() {
   // Leave approval states
   const [leaveRequests, setLeaveRequests] = useState([]);
 
-   // Employee management states
+  // Employee management states
   const [employees, setEmployees] = useState([]);
   const [editingEmployee, setEditingEmployee] = useState(null);
 
-    // ✅ This is the state you were missing / out of scope
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
+  // ✅ This is the state you were missing / out of scope
   const DEFAULT_FORM = {
-    id: '',
     name: '',
     email: '',
     dob: '',
@@ -30,6 +31,7 @@ export default function HRDashboard() {
     gender: '',
     maritalStatus: '',
     nationality: '',
+    role: 'Employee',
     status: 'Active', // non-editable in UI
   };
   const [formData, setFormData] = useState(DEFAULT_FORM);
@@ -54,16 +56,16 @@ export default function HRDashboard() {
       .catch(() => setLeaveRequests([]));
   }, []);
 
-   // Fetch all employees
+  // Fetch all employees
   useEffect(() => {
-    
-      axios.get(`http://localhost:4000/users`)
-        .then(res => {
-          const empList = res.data.filter(u => u.role === 'Employee'); // Only employees
-          setEmployees(empList);
-        })
-        .catch(() => setEmployees([]));
-    
+
+    axios.get(`http://localhost:4000/users`)
+      .then(res => {
+        const empList = res.data.filter(u => u.role === 'Employee'); // Only employees
+        setEmployees(empList);
+      })
+      .catch(() => setEmployees([]));
+
   }, [activeMenu]);
 
   // Derived counts for Home tab
@@ -94,7 +96,7 @@ export default function HRDashboard() {
       .catch(() => alert("Failed to reject leave"));
   };
 
-    // Employee management handlers
+  // Employee management handlers
   const deleteEmployee = (id) => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       axios.delete(`http://localhost:4000/users/${id}`)
@@ -110,7 +112,7 @@ export default function HRDashboard() {
       })
       .catch(() => alert("Failed to update employee"));
   };
-const openEditModal = (employee) => {
+  const openEditModal = (employee) => {
     setFormData(employee); // pre-fill modal
     setEditingEmployee(employee);
   };
@@ -127,6 +129,22 @@ const openEditModal = (employee) => {
         setEditingEmployee(null);
       })
       .catch(() => alert("Failed to update employee"));
+  };
+  // Open add modal
+
+  const handleAddClick = () => {
+    setFormData(DEFAULT_FORM); // clean form with default role/status
+    setAddModalOpen(true);
+  };
+
+  // Save new employee
+  const handleAddSave = () => {
+    axios.post("http://localhost:4000/users", formData)
+      .then((res) => {
+        setEmployees(prev => [...prev, res.data]); // keep table & home count in sync
+        setAddModalOpen(false);
+      })
+      .catch(() => alert("Failed to add employee"));
   };
   if (!loggedUser) return <div className="p-6">Please login first</div>;
   if (!hrProfile) return <div className="p-6">Loading...</div>;
@@ -149,10 +167,10 @@ const openEditModal = (employee) => {
           >
             HR Profile
           </li>
-           <li 
-           className={`mb-4 cursor-pointer px-4 py-2 rounded ${activeMenu === 'employees' ? 'bg-blue-600 text-white' : 'hover:bg-blue-100'}`} onClick={() => setActiveMenu('employees')}>
+          <li
+            className={`mb-4 cursor-pointer px-4 py-2 rounded ${activeMenu === 'employees' ? 'bg-blue-600 text-white' : 'hover:bg-blue-100'}`} onClick={() => setActiveMenu('employees')}>
             Employee Management
-           </li>
+          </li>
 
           <li
             className={`mb-4 cursor-pointer px-4 py-2 rounded ${activeMenu === 'leave' ? 'bg-blue-600 text-white' : 'hover:bg-blue-100'}`}
@@ -173,7 +191,7 @@ const openEditModal = (employee) => {
       <main className="flex-1 p-6">
         {/* Home Tab */}
         {activeMenu === 'home' && (
-           <div>
+          <div>
             <h1 className="text-3xl font-bold mb-4">Welcome, {hrProfile.name}!</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md">
               <div className="p-4 bg-white shadow rounded">
@@ -195,27 +213,27 @@ const openEditModal = (employee) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl">
               <div>
                 <label className="block mb-1 font-medium">Name</label>
-                <input type="text" value={hrProfile.name || ''} onChange={e => setHrProfile({...hrProfile, name: e.target.value})} className="w-full p-2 border rounded" />
+                <input type="text" value={hrProfile.name || ''} onChange={e => setHrProfile({ ...hrProfile, name: e.target.value })} className="w-full p-2 border rounded" />
               </div>
               <div>
                 <label className="block mb-1 font-medium">Email</label>
-                <input type="email" value={hrProfile.email || ''} onChange={e => setHrProfile({...hrProfile, email: e.target.value})} className="w-full p-2 border rounded" />
+                <input type="email" value={hrProfile.email || ''} onChange={e => setHrProfile({ ...hrProfile, email: e.target.value })} className="w-full p-2 border rounded" />
               </div>
               <div>
                 <label className="block mb-1 font-medium">Date of Birth</label>
-                <input type="date" value={hrProfile.dob || ''} onChange={e => setHrProfile({...hrProfile, dob: e.target.value})} className="w-full p-2 border rounded" />
+                <input type="date" value={hrProfile.dob || ''} onChange={e => setHrProfile({ ...hrProfile, dob: e.target.value })} className="w-full p-2 border rounded" />
               </div>
               <div>
                 <label className="block mb-1 font-medium">Joining Date</label>
-                <input type="date" value={hrProfile.joiningDate || ''} onChange={e => setHrProfile({...hrProfile, joiningDate: e.target.value})} className="w-full p-2 border rounded" />
+                <input type="date" value={hrProfile.joiningDate || ''} onChange={e => setHrProfile({ ...hrProfile, joiningDate: e.target.value })} className="w-full p-2 border rounded" />
               </div>
               <div className="md:col-span-2">
                 <label className="block mb-1 font-medium">Address</label>
-                <textarea value={hrProfile.address || ''} onChange={e => setHrProfile({...hrProfile, address: e.target.value})} className="w-full p-2 border rounded" rows={3} />
+                <textarea value={hrProfile.address || ''} onChange={e => setHrProfile({ ...hrProfile, address: e.target.value })} className="w-full p-2 border rounded" rows={3} />
               </div>
               <div>
                 <label className="block mb-1 font-medium">Department</label>
-                <select value={hrProfile.department || ''} onChange={e => setHrProfile({...hrProfile, department: e.target.value})} className="w-full p-2 border rounded">
+                <select value={hrProfile.department || ''} onChange={e => setHrProfile({ ...hrProfile, department: e.target.value })} className="w-full p-2 border rounded">
                   <option value="">Select Department</option>
                   <option value="HR">HR</option>
                   <option value="Finance">Finance</option>
@@ -225,7 +243,7 @@ const openEditModal = (employee) => {
               </div>
               <div>
                 <label className="block mb-1 font-medium">Position</label>
-                <select value={hrProfile.position || ''} onChange={e => setHrProfile({...hrProfile, position: e.target.value})} className="w-full p-2 border rounded">
+                <select value={hrProfile.position || ''} onChange={e => setHrProfile({ ...hrProfile, position: e.target.value })} className="w-full p-2 border rounded">
                   <option value="">Select Position</option>
                   <option value="Manager">Manager</option>
                   <option value="Team Lead">Team Lead</option>
@@ -235,7 +253,7 @@ const openEditModal = (employee) => {
               </div>
               <div>
                 <label className="block mb-1 font-medium">Gender</label>
-                <select value={hrProfile.gender || ''} onChange={e => setHrProfile({...hrProfile, gender: e.target.value})} className="w-full p-2 border rounded">
+                <select value={hrProfile.gender || ''} onChange={e => setHrProfile({ ...hrProfile, gender: e.target.value })} className="w-full p-2 border rounded">
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -244,7 +262,7 @@ const openEditModal = (employee) => {
               </div>
               <div>
                 <label className="block mb-1 font-medium">Marital Status</label>
-                <select value={hrProfile.maritalStatus || ''} onChange={e => setHrProfile({...hrProfile, maritalStatus: e.target.value})} className="w-full p-2 border rounded">
+                <select value={hrProfile.maritalStatus || ''} onChange={e => setHrProfile({ ...hrProfile, maritalStatus: e.target.value })} className="w-full p-2 border rounded">
                   <option value="">Select Marital Status</option>
                   <option value="Single">Single</option>
                   <option value="Married">Married</option>
@@ -254,7 +272,7 @@ const openEditModal = (employee) => {
               </div>
               <div>
                 <label className="block mb-1 font-medium">Nationality</label>
-                <select value={hrProfile.nationality || ''} onChange={e => setHrProfile({...hrProfile, nationality: e.target.value})} className="w-full p-2 border rounded">
+                <select value={hrProfile.nationality || ''} onChange={e => setHrProfile({ ...hrProfile, nationality: e.target.value })} className="w-full p-2 border rounded">
                   <option value="">Select Nationality</option>
                   <option value="American">American</option>
                   <option value="Indian">Indian</option>
@@ -301,10 +319,11 @@ const openEditModal = (employee) => {
             </ul>
           </div>
         )}
-          {/* Employee Management */}
+        {/* Employee Management */}
         {activeMenu === 'employees' && (
           <div>
             <h1 className="text-2xl font-semibold mb-4">Employee Management</h1>
+            <button onClick={handleAddClick} className="bg-green-500 text-white px-4 py-2 rounded">Add Employee</button>
             {employees.length === 0 && <p>No employees found.</p>}
             <table className="min-w-full bg-white border border-gray-300">
               <thead>
@@ -324,76 +343,407 @@ const openEditModal = (employee) => {
                     <td className="py-2 px-4 border">{emp.department}</td>
                     <td className="py-2 px-4 border">{emp.position}</td>
                     <td className="py-2 px-4 border space-x-2">
-                      <button onClick={() => {setEditingEmployee(emp);setFormData(emp); }} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Edit</button>
+                      <button onClick={() => { setEditingEmployee(emp); setFormData(emp); }} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Edit</button>
                       <button onClick={() => deleteEmployee(emp.id)} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-{/* Edit Employee Modal */}
+
+
+            {/* Edit Employee Modal */}
             {editingEmployee && (
-                      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white p-6 rounded w-1/2">
-            <h2 className="text-xl font-bold mb-4">Edit Employee</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <input name="name" value={formData.name} onChange={handleFormChange} placeholder="Name" className="border p-2 rounded" />
-              <input name="email" value={formData.email} onChange={handleFormChange} placeholder="Email" className="border p-2 rounded" />
-              <input name="phone" value={formData.phone} onChange={handleFormChange} placeholder="Phone" className="border p-2 rounded" />
-              <input type="date" name="dob" value={formData.dob} onChange={handleFormChange} className="border p-2 rounded" />
-              <input type="date" name="joiningDate" value={formData.joiningDate} onChange={handleFormChange} className="border p-2 rounded" />
-              <input name="address" value={formData.address} onChange={handleFormChange} placeholder="Address" className="border p-2 rounded" />
-              <select name="department" value={formData.department} onChange={handleFormChange} className="border p-2 rounded">
-                <option value="">Select Department</option>
-                 <option value="HR">HR</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Development">Development</option>
-                  <option value="Sales">Sales</option>
-              </select>
-              <select name="position" value={formData.position} onChange={handleFormChange} className="border p-2 rounded">
-                <option value="">Select Position</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Team Lead">Team Lead</option>
-                  <option value="Developer">Developer</option>
-                  <option value="Intern">Intern</option>
-              </select>
-              <select name="gender" value={formData.gender} onChange={handleFormChange} className="border p-2 rounded">
-                <option value="">Select Gender</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
-              <select name="maritalStatus" value={formData.maritalStatus} onChange={handleFormChange} className="border p-2 rounded">
-                <option value="">Select Marital Status</option>
-                <option value="Single">Single</option>
-                  <option value="Married">Married</option>
-                  <option value="Divorced">Divorced</option>
-                  <option value="Widowed">Widowed</option>
-              </select>
-              <select name="nationality" value={formData.nationality} onChange={handleFormChange} className="border p-2 rounded">
-                <option value="">Select Nationality</option>
-               <option value="American">American</option>
-                  <option value="Indian">Indian</option>
-                  <option value="Canadian">Canadian</option>
-                  <option value="Other">Other</option>
-              </select>
-    
-  
+              <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div className="bg-white p-6 rounded w-1/2">
+                  <h2 className="text-xl font-bold mb-4">Edit Employee</h2>
+                  <div className="grid grid-cols-2 gap-4">
+
+                    <label>
+                      Name
+                      <input
+                        name="name"
+                        value={formData.name}
+                        onChange={handleFormChange}
+                        placeholder="Name"
+                        className="border p-2 rounded w-full"
+                      />
+                    </label>
+
+                    <label>
+                      Email
+                      <input
+                        name="email"
+                        value={formData.email}
+                        onChange={handleFormChange}
+                        placeholder="Email"
+                        className="border p-2 rounded w-full"
+                      />
+                    </label>
+
+                    <label>
+                      Phone
+                      <input
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleFormChange}
+                        placeholder="Phone"
+                        className="border p-2 rounded w-full"
+                      />
+                    </label>
+
+                    <label>
+                      Date of Birth
+                      <input
+                        type="date"
+                        name="dob"
+                        value={formData.dob}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      />
+                    </label>
+
+                    <label>
+                      Joining Date
+                      <input
+                        type="date"
+                        name="joiningDate"
+                        value={formData.joiningDate}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      />
+                    </label>
+
+                    <label>
+                      Address
+                      <input
+                        name="address"
+                        value={formData.address}
+                        onChange={handleFormChange}
+                        placeholder="Address"
+                        className="border p-2 rounded w-full"
+                      />
+                    </label>
+
+                    <label>
+                      Department
+                      <select
+                        name="department"
+                        value={formData.department}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      >
+                        <option value="">Select Department</option>
+                        <option value="HR">HR</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Development">Development</option>
+                        <option value="Sales">Sales</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Position
+                      <select
+                        name="position"
+                        value={formData.position}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      >
+                        <option value="">Select Position</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Team Lead">Team Lead</option>
+                        <option value="Developer">Developer</option>
+                        <option value="Intern">Intern</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Gender
+                      <select
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      >
+                        <option value="">Select Gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Marital Status
+                      <select
+                        name="maritalStatus"
+                        value={formData.maritalStatus}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      >
+                        <option value="">Select Marital Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                        <option value="Widowed">Widowed</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Nationality
+                      <select
+                        name="nationality"
+                        value={formData.nationality}
+                        onChange={handleFormChange}
+                        className="border p-2 rounded w-full"
+                      >
+                        <option value="">Select Nationality</option>
+                        <option value="American">American</option>
+                        <option value="Indian">Indian</option>
+                        <option value="Canadian">Canadian</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Status
+                      <input
+                        name="status"
+                        value={formData.status || "Active"}
+                        disabled
+                        className="border p-2 rounded bg-gray-100 w-full"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      onClick={() => setEditingEmployee(null)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveEmployee}
+                      className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            )}
 
 
-              <input name="status" value={formData.status || "Active"} disabled className="border p-2 rounded bg-gray-100" />
-            </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => setEditingEmployee(null)} className="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-              <button onClick={handleSaveEmployee} className="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+            {/* Add Modal */}
+            {addModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="bg-white p-6 rounded w-1/2">
+                  <h2 className="text-xl font-bold mb-4">Add Employee</h2>
+                  <div className="grid grid-cols-2 gap-4">
+
+                    {/* Name */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Name</label>
+                      <input
+                        name="name"
+                        value={formData.name}
+                        onChange={handleFormChange}
+                        placeholder="Enter Name"
+                        className="border p-2 w-full"
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Email</label>
+                      <input
+                        name="email"
+                        value={formData.email}
+                        onChange={handleFormChange}
+                        placeholder="Enter Email"
+                        className="border p-2 w-full"
+                      />
+                    </div>
+
+                    {/* Date of Birth */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Date of Birth</label>
+                      <input
+                        type="date"
+                        name="dob"
+                        value={formData.dob}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      />
+                    </div>
+
+                    {/* Joining Date */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Joining Date</label>
+                      <input
+                        type="date"
+                        name="joiningDate"
+                        value={formData.joiningDate}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      />
+                    </div>
+
+                    {/* Address */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Address</label>
+                      <input
+                        name="address"
+                        value={formData.address}
+                        onChange={handleFormChange}
+                        placeholder="Enter Address"
+                        className="border p-2 w-full"
+                      />
+                    </div>
+
+                    {/* Department */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Department</label>
+                      <select
+                        name="department"
+                        value={formData.department}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      >
+                        <option value="">Select Department</option>
+                        <option value="HR">HR</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Development">Development</option>
+                        <option value="Sales">Sales</option>
+                      </select>
+                    </div>
+
+                    {/* Position */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Position</label>
+                      <select
+                        name="position"
+                        value={formData.position}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      >
+                        <option value="">Select Position</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Team Lead">Team Lead</option>
+                        <option value="Developer">Developer</option>
+                        <option value="Intern">Intern</option>
+                      </select>
+                    </div>
+
+                    {/* Gender */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Gender</label>
+                      <select
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Marital Status */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Marital Status</label>
+                      <select
+                        name="maritalStatus"
+                        value={formData.maritalStatus}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      >
+                        <option value="">Select Marital Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                        <option value="Widowed">Widowed</option>
+                      </select>
+                    </div>
+
+                    {/* Nationality */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Nationality</label>
+                      <select
+                        name="nationality"
+                        value={formData.nationality}
+                        onChange={handleFormChange}
+                        className="border p-2 w-full"
+                      >
+                        <option value="">Select Nationality</option>
+                        <option value="American">American</option>
+                        <option value="Indian">Indian</option>
+                        <option value="Canadian">Canadian</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Status */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Status</label>
+                      <input
+                        name="status"
+                        value={formData.status}
+                        readOnly
+                        className="border p-2 bg-gray-200 w-full"
+                      />
+                    </div>
+
+                    {/* Role */}
+                    <div>
+                      <label className="block mb-1 font-semibold">Role</label>
+                      <div>
+                        <label>
+                          <input
+                            type="radio"
+                            name="role"
+                            value="Employee"
+                            checked={formData.role === "Employee"}
+                            onChange={handleFormChange}
+                          /> Employee
+                        </label>
+                        <label className="ml-4">
+                          <input
+                            type="radio"
+                            name="role"
+                            value="HR"
+                            checked={formData.role === "HR"}
+                            onChange={handleFormChange}
+                          /> HR
+                        </label>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => setAddModalOpen(false)}
+                      className="bg-gray-400 px-4 py-2 rounded mr-2"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddSave}
+                      className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+           </div>
         )}
-
-
       </main>
     </div>
   );

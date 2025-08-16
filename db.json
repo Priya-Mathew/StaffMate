@@ -3,7 +3,7 @@
     {
       "id": "1",
       "email": "hr@example.com",
-      "password": "hr123",
+      "password": "4567",
       "role": "HR",
       "name": "HR Manager",
       "phone": "12345666",
@@ -94,6 +94,38 @@
       "role": "Employee",
       "password": "1234",
       "confirmPassword": "1234"
+    },
+    {
+      "id": "3r66",
+      "name": "Chris",
+      "email": "Chris@gmail.com",
+      "dob": "1995-06-14",
+      "joiningDate": "2016-10-18",
+      "address": "224 xyz",
+      "department": "Finance",
+      "position": "Manager",
+      "gender": "Male",
+      "maritalStatus": "Single",
+      "nationality": "Canadian",
+      "role": "Employee",
+      "password": "4567",
+      "confirmPassword": "4567",
+      "status": "Active"
+    },
+    {
+      "id": "5d26",
+      "name": "Wineeta",
+      "email": "Wineeta@gmail.com",
+      "dob": "2006-01-09",
+      "joiningDate": "2020-12-28",
+      "address": "nyz city",
+      "department": "Finance",
+      "position": "Developer",
+      "gender": "Female",
+      "maritalStatus": "Married",
+      "nationality": "American",
+      "role": "Employee",
+      "status": "Active"
     }
   ],
   "leaveRequests": [
